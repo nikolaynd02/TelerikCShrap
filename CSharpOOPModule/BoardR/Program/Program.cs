@@ -5,25 +5,23 @@
         static void Main(string[] args)
         {
             var item = new BoardItem("Refactor this mess", DateTime.Now.AddDays(2));
+            item.DueDate = item.DueDate.AddYears(2);
+            item.Title = "Not that important";
+            item.RevertStatus();
             item.AdvanceStatus();
-            var anotherItem = new BoardItem("Encrypt user data", DateTime.Now.AddDays(10));
+            item.RevertStatus();
 
-            Board.items.Add(item);
-            Board.items.Add(anotherItem);
+            Console.WriteLine(item.ViewHistory());
 
-            foreach (var boardItem in Board.items)
-            {
-                boardItem.AdvanceStatus();
-            }
+            Console.WriteLine("\n--------------\n");
 
-            foreach (var boardItem in Board.items)
-            {
-                Console.WriteLine(boardItem.ViewInfo());
-            }
-
-            // Output:
-            // 'Refactor this mess', [InProgress|25-01-2020]
-            // 'Encrypt user data', [Todo|02-02-2020]
+            var anotherItem = new BoardItem("Don't refactor anything", DateTime.Now.AddYears(10));
+            anotherItem.AdvanceStatus();
+            anotherItem.AdvanceStatus();
+            anotherItem.AdvanceStatus();
+            anotherItem.AdvanceStatus();
+            anotherItem.AdvanceStatus();
+            Console.WriteLine(anotherItem.ViewHistory());
         }
     }
 }
