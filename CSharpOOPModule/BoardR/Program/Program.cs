@@ -4,24 +4,16 @@
     {
         static void Main(string[] args)
         {
-            var item = new BoardItem("Refactor this mess", DateTime.Now.AddDays(2));
-            item.DueDate = item.DueDate.AddYears(2);
-            item.Title = "Not that important";
-            item.RevertStatus();
-            item.AdvanceStatus();
-            item.RevertStatus();
+            var item1 = new BoardItem("Implement login/logout", DateTime.Now.AddDays(3));
+            var item2 = new BoardItem("Secure admin endpoints", DateTime.Now.AddDays(5));
 
-            Console.WriteLine(item.ViewHistory());
+            Board.AddItem(item1); // add item1
+            Board.AddItem(item2); // add item2
+            Board.AddItem(item1); // do nothing - item1 already in the list
+            Board.AddItem(item2); // do nothing - item2 already in the list
 
-            Console.WriteLine("\n--------------\n");
-
-            var anotherItem = new BoardItem("Don't refactor anything", DateTime.Now.AddYears(10));
-            anotherItem.AdvanceStatus();
-            anotherItem.AdvanceStatus();
-            anotherItem.AdvanceStatus();
-            anotherItem.AdvanceStatus();
-            anotherItem.AdvanceStatus();
-            Console.WriteLine(anotherItem.ViewHistory());
+            int count = Board.TotalItems;
+            // count: 2
         }
     }
 }
