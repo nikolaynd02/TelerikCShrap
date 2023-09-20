@@ -11,7 +11,7 @@ namespace Program
         private string title;
         private DateTime dueDate;
         private Status status;
-        private List<EventLog> history;
+        private protected List<EventLog> history;
 
         private const Status initialStatus = Status.Open;
         private const Status finalStatus = Status.Verified;
@@ -37,7 +37,7 @@ namespace Program
 
             this.history = new List<EventLog>();
 
-            this.history.Add(new EventLog("Item created"));
+            //this.history.Add(new EventLog("Item created"));
 
             this.status = Status.Open;
         }
@@ -68,6 +68,7 @@ namespace Program
                 }
 
                 this.history.Add(new EventLog($"Title changed from {this.title} to {value}"));
+
                 this.title = value;
             }
         }
@@ -96,8 +97,6 @@ namespace Program
             {
                 this.history.Add(new EventLog($"Status changed from {status} to {--status}"));
 
-                //status--;
-
                 return;
             }
             this.history.Add(new EventLog($"Can't revert, already Open"));
@@ -107,8 +106,7 @@ namespace Program
         {
             if (status != finalStatus)
             {
-                this.history.Add(new EventLog($"Status changed from {status} to {++status}"));
-                //status++;
+                this.history.Add(new EventLog($"Status changed from {status} to {++status}"));                
 
                 return;
             }
