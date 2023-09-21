@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Program
+namespace Boarder
 {
     internal class Issue : BoardItem
     {
@@ -15,7 +14,7 @@ namespace Program
         {
             this.Description = description;
 
-            history.Add(new EventLog($"Created Issue: '{title}', [{Status}|{dueDate.ToString("dd-MM-yyyy")}]. Description: {description}"));
+            AddEventLog($"Created Issue: '{title}', [{Status}|{dueDate.ToString("dd-MM-yyyy")}]. Description: {description}");
 
         }
 
@@ -32,7 +31,7 @@ namespace Program
                 {
                     description = value;
                 }
-            } 
+            }
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Program
+namespace Boarder
 {
     internal class Task : BoardItem
     {
@@ -22,29 +22,29 @@ namespace Program
             }
 
             this.assignee = assignee;
-            
-            AdvanceStatus();
 
-            history.Add(new EventLog($"Created Task: '{title}', [{Status}|{dueDate.ToString("dd-MM-yyyy")}]"));
+            Status = Status.ToDo;
+
+            AddEventLog($"Created Task: '{title}', [{Status}|{dueDate.ToString("dd-MM-yyyy")}]");
         }
 
-        public string Assignee 
+        public string Assignee
         {
             get { return assignee; }
-            set 
+            set
             {
                 if (string.IsNullOrEmpty(value))
                 {
                     throw new ArgumentNullException("Assignee can not be null or empty");
                 }
-                if(value.Length < 5 || value.Length > 30)
+                if (value.Length < 5 || value.Length > 30)
                 {
                     throw new ArgumentException("Assignee should have length between 5 and 30 symbols.");
                 }
 
-                history.Add(new EventLog($"Assignee changed from {assignee} to {value}"));
+                AddEventLog($"Assignee changed from {assignee} to {value}");
 
-                assignee = value; 
+                assignee = value;
             }
         }
     }
