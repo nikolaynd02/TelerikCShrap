@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
+using Boarder.Models;
 
 namespace Boarder
 {
@@ -23,6 +25,18 @@ namespace Boarder
             {
                 return Items.Count;
             }
+        }
+
+        public static void LogHistory()
+        {
+            StringBuilder output = new StringBuilder();
+
+            foreach(BoardItem item in Items)
+            {
+                output.AppendLine(item.ViewHistory());
+            }
+
+            Console.WriteLine(output.ToString());
         }
     }
 }
