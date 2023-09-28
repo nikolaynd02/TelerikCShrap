@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using Boarder.Loggers;
 using Boarder.Models;
 
 namespace Boarder
@@ -8,6 +8,7 @@ namespace Boarder
     public static class Board
     {
         private static readonly List<BoardItem> Items = new List<BoardItem>();
+        private static readonly ILogger logger;
 
         public static void AddItem(BoardItem item)
         {
@@ -27,16 +28,12 @@ namespace Boarder
             }
         }
 
-        public static void LogHistory()
+        public static void LogHistory(ILogger logger)
         {
-            StringBuilder output = new StringBuilder();
-
-            foreach(BoardItem item in Items)
+            foreach (BoardItem item in Items)
             {
-                output.AppendLine(item.ViewHistory());
+                logger.Log(item.ViewHistory());
             }
-
-            Console.WriteLine(output.ToString());
         }
     }
 }

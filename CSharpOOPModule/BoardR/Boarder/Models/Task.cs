@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Boarder.Models
 {
@@ -7,7 +8,7 @@ namespace Boarder.Models
         private string assignee;
 
         public Task(string title, string assignee, DateTime dueDate)
-            : base(title, dueDate, Status.Open)
+            : base(title, dueDate, Status.Todo)
         {
             this.EnsureValidAssignee(assignee);
             this.assignee = assignee;
@@ -28,35 +29,40 @@ namespace Boarder.Models
             }
         }
 
+        public override string ViewInfo()
+        {
+            var baseinfo = base.ViewInfo();
+
+            return $"Task, {baseinfo}, Assignee: {this.assignee}";
+        }
+
         public override void AdvanceStatus()
         {
             if (this.Status != Status.Verified)
             {
-                var prevStatus = this.Status;
+                var prev = this.Status;
                 this.Status++;
-
-                this.AddEventLog($"Task status changed from {prevStatus} to {this.Status}");
+                this.AddEventLog($"Task changed from {prev} to {this.Status}");
             }
             else
             {
-                this.AddEventLog($"Task can't advance, already at {Status.Verified}");
+                this.AddEventLog("Task status already Verified");
             }
         }
+
         public override void RevertStatus()
         {
-            if (this.Status != Status.Open)
+            if (this.Status != Status.Todo)
             {
-                var prevStatus = this.Status;
+                var prev = this.Status;
                 this.Status--;
-
-                this.AddEventLog($"Task status changed from {prevStatus} to {this.Status}");
+                this.AddEventLog($"Task changed from {prev} to {this.Status}");
             }
             else
             {
-                this.AddEventLog($"Task can't revert, already at {Status.Open}");
+                this.AddEventLog("Task status already Todo");
             }
         }
-
 
         private void EnsureValidAssignee(string value)
         {

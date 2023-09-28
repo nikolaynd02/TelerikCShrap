@@ -14,30 +14,36 @@ namespace Boarder.Models
 
         public string Description { get; }
 
+        public override string ViewInfo()
+        {
+            var baseinfo = base.ViewInfo();
+
+            return $"Issue, {baseinfo}, Description: {Description}";
+        }
+
         public override void AdvanceStatus()
         {
-            if(Status != Status.Verified)
+            if (this.Status != Status.Verified)
             {
-                Status = Status.Verified;
-
-                AddEventLog($"Issue status changed from Open to Verified");
-            }
+                this.Status = Status.Verified;
+                this.AddEventLog("Issue status set to Verified");
+            } 
             else
             {
-                AddEventLog($"Issue can't advance, already at Verified");
+                this.AddEventLog("Issue status already Verified");
             }
         }
+
         public override void RevertStatus()
         {
-            if(Status != Status.Open)
+            if (this.Status != Status.Open)
             {
-                Status = Status.Open;
-
-                AddEventLog($"Issue status changed from Verified to Open");
+                this.Status = Status.Open;
+                this.AddEventLog("Issue status set to Open");
             }
             else
             {
-                AddEventLog($"Issue can't revert, already at Open");
+                this.AddEventLog("Issue status already Open");
             }
         }
     }

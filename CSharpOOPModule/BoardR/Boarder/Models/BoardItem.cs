@@ -8,8 +8,6 @@ namespace Boarder.Models
     {
         private const string DateFormat = "dd-MM-yyyy";
 
-        private readonly Status initialStatus;
-        private readonly Status finalStatus = Status.Verified;
         private readonly List<EventLog> history = new List<EventLog>();
         private string title;
         private DateTime dueDate;
@@ -21,7 +19,6 @@ namespace Boarder.Models
 
             this.dueDate = dueDate;
             this.title = title;
-            this.initialStatus = initialStatus;
             this.Status = initialStatus;
         }
 
@@ -58,36 +55,10 @@ namespace Boarder.Models
         public Status Status { get; protected set; }
 
         public abstract void RevertStatus();
-        //{
-        //    if (this.Status != this.initialStatus)
-        //    {
-        //        var prevStatus = this.Status;
-        //        this.Status--;
-
-        //        this.AddEventLog($"Status changed from {prevStatus} to {this.Status}");
-        //    }
-        //    else
-        //    {
-        //        this.AddEventLog($"Can't revert, already at {this.initialStatus}");
-        //    }
-        //}
 
         public abstract void AdvanceStatus();
-        //{
-        //    if (this.Status != this.finalStatus)
-        //    {
-        //        var prevStatus = this.Status;
-        //        this.Status++;
 
-        //        this.AddEventLog($"Status changed from {prevStatus} to {this.Status}");
-        //    }
-        //    else
-        //    {
-        //        this.AddEventLog($"Can't advance, already at {this.finalStatus}");
-        //    }
-        //}
-
-        public string ViewInfo()
+        public virtual string ViewInfo()
         {
             return $"'{this.Title}', [{this.Status}|{this.DueDate.ToString(DateFormat)}]";
         }
