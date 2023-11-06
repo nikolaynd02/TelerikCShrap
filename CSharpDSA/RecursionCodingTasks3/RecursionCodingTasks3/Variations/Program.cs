@@ -23,8 +23,7 @@ namespace Variations
         }
 
 
-        static void GenerateAllBinaryCombinations(int length,
-                            char[] arr, int iteration , char first, char second)
+        static void GenerateAllBinaryCombinations(int length, char[] arr, int iteration , char first, char second)
         {
             if (iteration == length)
             {
