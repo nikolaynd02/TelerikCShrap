@@ -1,4 +1,5 @@
 ﻿using BeerOverflow.Models;
+using BeerOverflow.Services.Contracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,30 +10,29 @@ namespace BeerOverflow.Controllers
     [ApiController]
     public class BeersApiController : ControllerBase
     {
-        static List<Beer> beers = new List<Beer>
+        private readonly IBeerService beerService;
+        public BeersApiController(IBeerService beerService)
         {
-            new Beer { Id = 1, Name = "Heisenberg", Abv = 10},
-            new Beer{ Id = 2, Name = "Haineken", Abv=5}
-        };
+            this.beerService = beerService;
+        }
 
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            var myBeer = beers.FirstOrDefault(b => b.Id == id);
-
-            if (myBeer == null)
+            try
             {
-                return NotFound();
+                return Ok(beerService.Get(id));
             }
-
-
-            return Ok(myBeer);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet]
-        public IActionResult Get() 
+        public IActionResult GetAll()
         {
-            return Ok(beers);
+            return Ok(beerService.GetAll());
         }
 
         [HttpPost]
@@ -40,43 +40,44 @@ namespace BeerOverflow.Controllers
         {
             //Beer newBeer = new Beer {Id = beer.Id, Name = beer.Name, Abv = beer.Abv };
 
+            try
+            {
+                beerService.Create(beer);
 
-
-            beers.Add(beer);
-
-            return Ok(beer);
+                return Ok(beer);
+            }
+            catch (Exception ex) 
+            {
+                return BadRequest(ex.Message);
+            }
+            
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update([FromBody]Beer beer, int id)
+        public IActionResult Update([FromBody] Beer beer, int id)
         {
-            var oldBeer = beers.FirstOrDefault(b => b.Id == id);
-
-            if(oldBeer == null)
+            try
             {
-                return NotFound();
+                return Ok(beerService.Update(id, beer));
             }
-
-            oldBeer.Id = beer.Id;
-            oldBeer.Name = beer.Name;
-            oldBeer.Abv = beer.Abv;
-
-            return Ok(oldBeer);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var beerForDeletion = beers.FirstOrDefault(b => b.Id == id);
-
-            if(beerForDeletion == null)
+            try
             {
-                return NotFound();
+                beerService.Delete(id);
+                return Ok();
             }
-
-            beers.Remove(beerForDeletion);
-
-            return Ok(beerForDeletion);
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
 

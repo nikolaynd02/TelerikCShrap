@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BeerOverflow.Models.Contracts;
+using System.ComponentModel.DataAnnotations;
 
 namespace BeerOverflow.Models
 {
-    public class Beer
+    public class Beer : IBeer
     {
         public int Id { get; set; }
 
