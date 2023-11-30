@@ -9,7 +9,7 @@ namespace BeerOverflow.Services
 {
     public class BeerService : IBeerService
     {
-        private IBeersRepository context;
+        private readonly IBeersRepository context;
 
         public BeerService(IBeersRepository beersRepository)
         {
