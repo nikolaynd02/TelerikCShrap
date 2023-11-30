@@ -1,4 +1,5 @@
 ﻿using BeerOverflow.Models;
+using BeerOverflow.Services;
 using BeerOverflow.Services.Contracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
