@@ -1,5 +1,0 @@
-﻿@BeerOverflow_HostAddress = http://localhost:62157
-
-GET {{BeerOverflow_HostAddress}}/api/beers
-
-###
