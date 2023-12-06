@@ -16,17 +16,17 @@ namespace BeerOverflow.Services
 
         public IEnumerable<User> GetAll()
         {
-            return usersRepository.GetAll();
+            return usersRepository.GetAll().Result;
         }
 
         public User GetById(int id)
         {
-            return usersRepository.GetById(id);
+            return usersRepository.GetById(id).Result;
         }
 
         public User GetByUsername(string username)
         {
-            return usersRepository.GetByUsername(username);
+            return usersRepository.GetByUsername(username).Result;
         }
     }
 }

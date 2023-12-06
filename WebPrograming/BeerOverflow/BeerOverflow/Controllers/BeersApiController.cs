@@ -4,6 +4,7 @@ using BeerOverflow.Models;
 using BeerOverflow.Services.Contracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace BeerOverflow.Controllers
 {
@@ -49,6 +50,10 @@ namespace BeerOverflow.Controllers
             {
                 return NotFound(ex.Message);
             }
+            catch (AggregateException ex)
+            {
+                return NotFound(ex.InnerException.Message);
+            }
         }
 
         // This method handles POST requests sent to http://localhost:5000/api/beers
@@ -74,7 +79,10 @@ namespace BeerOverflow.Controllers
             {
                 return Unauthorized(ex.Message);
             }
-
+            catch (AggregateException ex)
+            {
+                return NotFound(ex.InnerException.Message);
+            }
         }
 
         // This method handles PUT requests sent to http://localhost:5000/api/beers/:id
@@ -103,6 +111,10 @@ namespace BeerOverflow.Controllers
             {
                 return Unauthorized(ex.Message);
             }
+            catch(AggregateException ex)
+            {
+                return NotFound(ex.InnerException.Message);
+            }
         }
 
         // This method handles DELETE requests sent to http://localhost:5000/api/beers/:id 
@@ -126,6 +138,10 @@ namespace BeerOverflow.Controllers
             catch (AuthorizationException ex)
             {
                 return Unauthorized(ex.Message);
+            }
+            catch (AggregateException ex)
+            {
+                return NotFound(ex.InnerException.Message);
             }
         }
     }

@@ -1,11 +1,12 @@
 ﻿using BeerOverflow.Models;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BeerOverflow.Repositories.Contracts
 {
     public interface IStylesRepository
     {
-        List<Style> GetAll();
-        Style GetById(int id);
+        public Task<IEnumerable<Style>> GetAll();
+        public Task<Style> GetById(int id);
     }
 }

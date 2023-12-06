@@ -1,35 +1,47 @@
-﻿using BeerOverflow.Exceptions;
+﻿using BeerOverflow.Data;
+using BeerOverflow.Exceptions;
 using BeerOverflow.Models;
 using BeerOverflow.Repositories.Contracts;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace BeerOverflow.Repositories
 {
     public class StylesRepository : IStylesRepository
     {
-        private readonly List<Style> styles;
+        private readonly BeerOverflowDbContext context;
 
-        public StylesRepository()
+        public StylesRepository(BeerOverflowDbContext context)
         {
-            styles = new List<Style>()
-            {
-                new Style { Id = 1, Name = "Special Ale" },
-                new Style { Id = 2, Name = "English Porter" },
-                new Style { Id = 3, Name = "Indian Pale Ale" }
+            this.context = context;
+        }
+        public async Task<IEnumerable<Style>> GetAll()
+        {
+            var entities = await context
+                .Styles
+                .ToListAsync();
+
+            return entities
+                .Select(e => new Style 
+                { 
+                    Id = e.Id,
+                    Name = e.Name
+                });
+        }
+
+        public async Task<Style> GetById(int id)
+        {
+            var entities = await context
+                .Styles
+                .FirstOrDefaultAsync(s => s.Id == id) ?? throw new EntityNotFoundException($"Style with id {id} does not exist.");
+
+            return new Style 
+            { 
+                Id = entities.Id,
+                Name =entities.Name
             };
-        }
-        public List<Style> GetAll()
-        {
-            return styles;
-        }
-
-        public Style GetById(int id)
-        {
-            Style style = styles.FirstOrDefault(s => s.Id == id)
-                ?? throw new EntityNotFoundException($"Style with id {id} does not exist.");
-            return style;
-
         }
     }
 }

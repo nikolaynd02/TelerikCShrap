@@ -5,7 +5,7 @@ namespace BeerOverflow.Services.Contracts
 {
     public interface IStylesService
     {
-        List<Style> GetAll();
-        Style GetById(int id);
+        public IList<Style> GetAll();
+        public Style GetById(int id);
     }
 }

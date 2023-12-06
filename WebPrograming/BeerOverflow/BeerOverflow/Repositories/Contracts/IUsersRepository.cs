@@ -1,12 +1,13 @@
 ﻿using BeerOverflow.Models;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BeerOverflow.Repositories.Contracts
 {
     public interface IUsersRepository
     {
-        public IEnumerable<User> GetAll();
-        public User GetById(int id);
-        public User GetByUsername(string username);
+        public Task<IEnumerable<User>> GetAll();
+        public Task<User> GetById(int id);
+        public Task<User> GetByUsername(string username);
     }
 }

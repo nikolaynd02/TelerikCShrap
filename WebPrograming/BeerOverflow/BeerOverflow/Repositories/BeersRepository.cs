@@ -1,69 +1,90 @@
-﻿using BeerOverflow.Exceptions;
+﻿using BeerOverflow.Data;
+using BeerOverflow.Data.Models;
+using BeerOverflow.Exceptions;
 using BeerOverflow.Models;
 using BeerOverflow.Repositories.Contracts;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace BeerOverflow.Repositories
 {
     public class BeersRepository : IBeersRepository
     {
-        private static int nextId;
         private readonly IStylesRepository stylesRepository;
-        private readonly List<Beer> beers;
-        public BeersRepository(IStylesRepository stylesRepository)
+        private readonly BeerOverflowDbContext context;
+        public BeersRepository(IStylesRepository stylesRepository, BeerOverflowDbContext context)
         {
             this.stylesRepository = stylesRepository;
-
-            beers = new List<Beer>()
-        {
-            new Beer
-            {
-                Id = 1,
-                Name = "Glarus English Ale",
-                Abv = 4.6,
-                Style = stylesRepository.GetById(1)
-            },
-            new Beer
-            {
-                Id = 2,
-                Name = "Rhombus Porter",
-                Abv = 5.0,
-                Style = stylesRepository.GetById(2)
-            },
-            new Beer
-                {
-                    Id = 3,
-                    Name = "Opasen Char",
-                    Abv = 6.6,
-                    Style = this.stylesRepository.GetById(3), // Indian Pale Ale
-				}
-        };
-            nextId = beers.Count + 1;
+            this.context = context;
         }
 
-        public Beer Create(Beer beer)
+        public Beer Create(Beer beer, int styleId, int userId)
         {
-            beer.Id = nextId++;
-            beers.Add(beer);
+            var entity = new BeerDb()
+            {
+                Id = beer.Id,
+                Name = beer.Name,
+                Abv = beer.Abv,
+                StyleId = styleId,
+                CreatedById = userId
+            };
+
+            context.Beers.Add(entity);
+            context.SaveChangesAsync();
+
             return beer;
         }
 
-        public void Delete(int id)
+        public async void Delete(int id)
         {
-            var beerToDelete = beers.FirstOrDefault(beer => beer.Id == id)
-                ?? throw new EntityNotFoundException($"Beer with id {id} not found");
-            beers.Remove(beerToDelete);
+            var entityCheck =context.
+                Beers
+                //.Include(b => b.Style)
+                //.Include(b => b.CreatedBy)
+                .Find(id) ?? throw new EntityNotFoundException($"Beer with id {id} not found");
+
+            context.Beers.Remove(entityCheck);
+
+            context.SaveChanges();
+
         }
 
-        public IList<Beer> GetAll()
+        public async Task<IEnumerable<Beer>> GetAll()
         {
-            return beers;
+            var entitis = await context
+                .Beers
+                .Include(be => be.Style)
+                .Include(be => be.CreatedBy)
+                .ToListAsync();
+
+            return entitis
+                .Select(e => new Beer()
+                {
+                    Id=e.Id,
+                    Name=e.Name,
+                    Abv=e.Abv,
+                    CreatedBy = e.CreatedBy.Username,
+                    Style = new Style()
+                    {
+                        Id = e.Style.Id,
+                        Name = e.Style.Name,
+                    }
+                });
         }
-        public IList<Beer> FilterBy(BeerQueryParameters beerQueryParameters)
+        public async Task<IEnumerable<Beer>> FilterBy(BeerQueryParameters beerQueryParameters)
         {
-            List<Beer> beersToReturn = beers;
+            //This is not good. MUST BE OPTIMISED
+            var beersToReturn = this.GetAll().Result.ToList();//await context
+                //.Beers
+                //.Include(be => be.Style)
+                //.Include(be => be.CreatedBy)
+                //.ToListAsync();
+
+            //List<Beer> beersToReturn = beers;
             if (!string.IsNullOrEmpty(beerQueryParameters.Name))
             {
                 beersToReturn = beersToReturn.FindAll(b => b.Name.Contains(beerQueryParameters.Name));
@@ -102,38 +123,87 @@ namespace BeerOverflow.Repositories
 
 
 
-            return beersToReturn;
+            return beersToReturn
+                .Select(b => new Beer()
+                {
+                    Id = b.Id,
+                    Name = b.Name,
+                    Abv = b.Abv,
+                    CreatedBy = b.CreatedBy,
+                    Style = b.Style
+                });
         }
 
-        public Beer GetById(int id)
+        public async Task<Beer> GetById(int id)
         {
-            var beer = beers.FirstOrDefault(beer => beer.Id == id)
-                ?? throw new EntityNotFoundException($"Beer with id {id} not found");
-            return beer;
+            var entity = await context
+                .Beers
+                .Include(b => b.Style)
+                .Include(b => b.CreatedBy)
+                .FirstOrDefaultAsync(b => b.Id == id) ?? throw new EntityNotFoundException($"Beer with id {id} not found");
+            
+
+            return new Beer() 
+            {
+                Id = entity.Id,
+                Name = entity.Name,
+                Abv = entity.Abv,
+                Style = new Style() { Id = entity.Style.Id, Name = entity.Style.Name },
+                CreatedBy = entity.CreatedBy.Username
+            };
         }
 
-        public Beer Update(int id, Beer beer)
+        public async Task<Beer> Update(int id, Beer beer)
         {
-            var beerToUpdate = beers.FirstOrDefault(b => b.Id == id)
-                ?? throw new EntityNotFoundException($"Beer with id {id} not found");
+            //Hope it works
+
+            var entityCheck = await context.
+                Beers
+                //.Include(b => b.Style)
+                //.Include(b => b.CreatedBy)
+                .FindAsync(id) ?? throw new EntityNotFoundException($"Beer with id {id} not found");
+                
+            
+            var beerToUpdate = context.Beers.Include(b => b.CreatedBy).Include(b => b.Style).FirstOrDefault(b => b.Id == id);
+
+            //beerToUpdate.IsDeleted = true;
 
             beerToUpdate.Abv = beer.Abv;
             beerToUpdate.Name = beer.Name;
-            beerToUpdate.Style = beer.Style;
+            beerToUpdate.StyleId = context.Styles.FirstOrDefaultAsync(s => s.Id == beer.Style.Id).Id;
 
-            return beerToUpdate;
+            await context.SaveChangesAsync();
+
+            return new Beer() 
+            {
+                Id = beerToUpdate.Id,
+                Name = beerToUpdate.Name,
+                Abv = beerToUpdate.Abv,
+                CreatedBy = beerToUpdate.CreatedBy.Username,
+                Style = new Style() { Id= beerToUpdate.Style.Id, Name= beerToUpdate.Style.Name }
+            };
 
         }
-        public bool BeerExists(string name)
+        public async Task<bool> BeerExists(string name)
         {
-            return beers.Any(beer => beer.Name == name);
+            var entity = await context.Beers.FirstOrDefaultAsync(b => b.Name == name);
+
+            return entity != null;
         }
 
-        public Beer GetByName(string name)
+        public async Task<Beer> GetByName(string name)
         {
-            Beer beer = beers.FirstOrDefault(b => b.Name == name);
+            var entity = await context.Beers.Include(b => b.CreatedBy).Include(b => b.Style).FirstOrDefaultAsync(b => b.Name == name) ?? throw new EntityNotFoundException($"Beer with name={name} doesn't exist.");
 
-            return beer ?? throw new EntityNotFoundException($"Beer with name={name} doesn't exist."); ;
+
+            return new Beer()
+            {
+                Id = entity.Id,
+                Name = entity.Name,
+                Abv = entity.Abv,
+                CreatedBy = entity.CreatedBy.Username,
+                Style = new Style() { Id = entity.Style.Id, Name = entity.Style.Name }
+            };
         }
     }
 }

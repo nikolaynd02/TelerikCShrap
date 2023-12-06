@@ -16,7 +16,7 @@ namespace BeerOverflow.Helpers
             {
                 Name = beerDTO.Name,
                 Abv = beerDTO.Abv,
-                Style = stylesRepository.GetById(beerDTO.StyleId),
+                Style = stylesRepository.GetById(beerDTO.StyleId).Result,
             };
             return beer;
         }

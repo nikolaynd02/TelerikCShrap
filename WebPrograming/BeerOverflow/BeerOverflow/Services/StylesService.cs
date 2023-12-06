@@ -12,14 +12,14 @@ namespace BeerOverflow.Services
         {
             this.stylesRepository = stylesRepository;
         }
-        public List<Style> GetAll()
+        public IList<Style> GetAll()
         {
-            return stylesRepository.GetAll();
+            return (IList<Style>)stylesRepository.GetAll();
         }
 
         public Style GetById(int id)
         {
-            return stylesRepository.GetById(id);
+            return stylesRepository.GetById(id).Result;
         }
     }
 }
