@@ -55,7 +55,12 @@ namespace BeerOverflow.Services
             {
                 throw new AuthorizationException($"User {user.Username} is not admin nor is he beer's creator.");
             }
-            EnsureBeerUniqueName(id, beer);
+            var oldBeer = this.GetById(id);
+            if( oldBeer.Name != beer.Name)
+            {
+                EnsureBeerUniqueName(id, beer);
+
+            }
             var updatedBeer = beersRepository.Update(id, beer).Result;
             return updatedBeer;
         }
