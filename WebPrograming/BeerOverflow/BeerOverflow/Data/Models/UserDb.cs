@@ -15,5 +15,7 @@ namespace BeerOverflow.Data.Models
         public bool IsDeleted { get; set; }
 
         public ICollection<BeerDb> Beers { get; set; }
+
+        public ICollection<RatingDb> Ratings { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using BeerOverflow.Data.Models;
 using BeerOverflow.Exceptions;
 using BeerOverflow.Models;
+using BeerOverflow.Models.DTOs;
 using BeerOverflow.Repositories.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
@@ -39,7 +40,7 @@ namespace BeerOverflow.Repositories
             return beer;
         }
 
-        public async void Delete(int id)
+        public void Delete(int id)
         {
             var entityCheck =context.
                 Beers
@@ -53,67 +54,72 @@ namespace BeerOverflow.Repositories
 
         }
 
-        public async Task<IEnumerable<Beer>> GetAll()
+        public async Task<IEnumerable<BeerResponseDTO>> GetAll()
         {
             var entitis = await context
                 .Beers
                 .Include(be => be.Style)
                 .Include(be => be.CreatedBy)
+                .Include(be => be.Ratings)
                 .ToListAsync();
 
             return entitis
-                .Select(e => new Beer()
+                .Select(e => new BeerResponseDTO()
                 {
-                    Id=e.Id,
-                    Name=e.Name,
-                    Abv=e.Abv,
-                    CreatedBy = e.CreatedBy.Username,
-                    Style = new Style()
+                    Name = e.Name,
+                    Abv = e.Abv,
+                    CreatedBy = new UserResponseDTO() 
+                    { 
+                        Username = e.CreatedBy.Username,
+                        Fullname = $"{e.CreatedBy.FirstName} {e.CreatedBy.LastName}"
+                    },
+                    Style = new StyleResponseDTO()
                     {
-                        Id = e.Style.Id,
                         Name = e.Style.Name,
-                    }
+                    },
+                    AvgRating = e.Ratings.Count > 0 ? e.Ratings.Average(r => r.Value) : 0                    
                 });
         }
-        public async Task<IEnumerable<Beer>> FilterBy(BeerQueryParameters beerQueryParameters)
+        public async Task<IEnumerable<BeerResponseDTO>> FilterBy(BeerQueryParameters beerQueryParameters)
         {
             //This is not good. MUST BE OPTIMISED
-            var beersToReturn = this.GetAll().Result.ToList();//await context
-                //.Beers
-                //.Include(be => be.Style)
-                //.Include(be => be.CreatedBy)
-                //.ToListAsync();
+            IQueryable<BeerDb> beersToReturn = context
+                .Beers
+                .Include(be => be.Style)
+                .Include(be => be.CreatedBy)
+                .Include(be => be.Ratings)
+                ;
 
             //List<Beer> beersToReturn = beers;
             if (!string.IsNullOrEmpty(beerQueryParameters.Name))
             {
-                beersToReturn = beersToReturn.FindAll(b => b.Name.Contains(beerQueryParameters.Name));
+                beersToReturn = beersToReturn.Where(b => b.Name.Contains(beerQueryParameters.Name));
             }
             if (beerQueryParameters.MinAbv.HasValue)
             {
-                beersToReturn = beersToReturn.FindAll(b => b.Abv >= beerQueryParameters.MinAbv.Value);
+                beersToReturn = beersToReturn.Where(b => b.Abv >= beerQueryParameters.MinAbv.Value);
             }
             if (beerQueryParameters.MaxAbv.HasValue)
             {
-                beersToReturn = beersToReturn.FindAll(b => b.Abv <= beerQueryParameters.MaxAbv.Value);
+                beersToReturn = beersToReturn.Where(b => b.Abv <= beerQueryParameters.MaxAbv.Value);
             }
             if (beerQueryParameters.StyleId.HasValue)
             {
-                beersToReturn = beersToReturn.FindAll(b => b.Style.Id == beerQueryParameters.StyleId.Value);
+                beersToReturn = beersToReturn.Where(b => b.Style.Id == beerQueryParameters.StyleId.Value);
             }
             if (!string.IsNullOrEmpty(beerQueryParameters.SortBy))
             {
                 if (beerQueryParameters.SortBy == "name")
                 {
-                    beersToReturn = beersToReturn.OrderBy(b => b.Name).ToList();
+                    beersToReturn = beersToReturn.OrderBy(b => b.Name);
                 }
                 else if (beerQueryParameters.SortBy == "abv")
                 {
-                    beersToReturn = beersToReturn.OrderBy(b => b.Abv).ToList();
+                    beersToReturn = beersToReturn.OrderBy(b => b.Abv);
                 }
                 else if (beerQueryParameters.SortBy == "styleid")
                 {
-                    beersToReturn = beersToReturn.OrderBy(b => b.Style.Id).ToList();
+                    beersToReturn = beersToReturn.OrderBy(b => b.Style.Id);
                 }
                 if (!string.IsNullOrEmpty(beerQueryParameters.SortOrder) && beerQueryParameters.SortOrder == "desc")
                 {
@@ -121,35 +127,51 @@ namespace BeerOverflow.Repositories
                 }
             }
 
+            var beers = await beersToReturn.ToListAsync();
 
-
-            return beersToReturn
-                .Select(b => new Beer()
+            return beers
+                .Select(e => new BeerResponseDTO()
                 {
-                    Id = b.Id,
-                    Name = b.Name,
-                    Abv = b.Abv,
-                    CreatedBy = b.CreatedBy,
-                    Style = b.Style
+                    Name = e.Name,
+                    Abv = e.Abv,
+                    CreatedBy = new UserResponseDTO()
+                    {
+                        Username = e.CreatedBy.Username,
+                        Fullname = $"{e.CreatedBy.FirstName} {e.CreatedBy.LastName}"
+                    },
+                    Style = new StyleResponseDTO()
+                    {
+                        Name = e.Style.Name,
+                    },
+                    AvgRating = e.Ratings.Count > 0 ? e.Ratings.Average(r => r.Value) : 0
                 });
         }
 
-        public async Task<Beer> GetById(int id)
+        public async Task<BeerResponseDTO> GetById(int id)
         {
             var entity = await context
                 .Beers
                 .Include(b => b.Style)
                 .Include(b => b.CreatedBy)
+                .Include (b => b.Ratings)
                 .FirstOrDefaultAsync(b => b.Id == id) ?? throw new EntityNotFoundException($"Beer with id {id} not found");
-            
 
-            return new Beer() 
-            {
-                Id = entity.Id,
-                Name = entity.Name,
-                Abv = entity.Abv,
-                Style = new Style() { Id = entity.Style.Id, Name = entity.Style.Name },
-                CreatedBy = entity.CreatedBy.Username
+
+
+            return new BeerResponseDTO()
+                {
+                    Name = entity.Name,
+                    Abv = entity.Abv,
+                    CreatedBy = new UserResponseDTO()
+                    {
+                        Username = entity.CreatedBy.Username,
+                        Fullname = $"{entity.CreatedBy.FirstName} {entity.CreatedBy.LastName}"
+                    },
+                    Style = new StyleResponseDTO()
+                    {
+                        Name = entity.Style.Name,
+                    },
+                    AvgRating = entity.Ratings.Count > 0 ? entity.Ratings.Average(r => r.Value) : 0
             };
         }
 
@@ -170,7 +192,7 @@ namespace BeerOverflow.Repositories
 
             beerToUpdate.Abv = beer.Abv;
             beerToUpdate.Name = beer.Name;
-            beerToUpdate.StyleId = context.Styles.FirstOrDefaultAsync(s => s.Id == beer.Style.Id).Id;
+            beerToUpdate.StyleId = (await context.Styles.FirstOrDefaultAsync(s => s.Id == beer.Style.Id)).Id;
 
             await context.SaveChangesAsync();
 

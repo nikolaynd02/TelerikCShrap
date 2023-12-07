@@ -1,4 +1,5 @@
 ﻿using BeerOverflow.Models;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace BeerOverflow.Data.Models
@@ -17,5 +18,7 @@ namespace BeerOverflow.Data.Models
         public int CreatedById { get; set; }
         public UserDb CreatedBy { get; set; }
         public bool IsDeleted { get; set; }
+
+        public ICollection<RatingDb> Ratings { get; set; }
     }
 }

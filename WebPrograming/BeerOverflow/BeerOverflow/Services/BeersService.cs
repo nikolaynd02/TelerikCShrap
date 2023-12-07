@@ -1,5 +1,6 @@
 ﻿using BeerOverflow.Exceptions;
 using BeerOverflow.Models;
+using BeerOverflow.Models.DTOs;
 using BeerOverflow.Repositories.Contracts;
 using BeerOverflow.Services.Contracts;
 using System;
@@ -34,13 +35,13 @@ namespace BeerOverflow.Services
             beersRepository.Delete(id);
         }
 
-        public IEnumerable<Beer> GetAll()
+        public IEnumerable<BeerResponseDTO> GetAll()
         {
             var beers = beersRepository.GetAll();
             return beers.Result;
         }
 
-        public Beer GetById(int id)
+        public BeerResponseDTO GetById(int id)
         {
  
             var beer = beersRepository.GetById(id).Result;
@@ -58,7 +59,7 @@ namespace BeerOverflow.Services
             var updatedBeer = beersRepository.Update(id, beer).Result;
             return updatedBeer;
         }
-        public IEnumerable<Beer> FilterBy(BeerQueryParameters beerQueryParameters)
+        public IEnumerable<BeerResponseDTO> FilterBy(BeerQueryParameters beerQueryParameters)
         {
             return beersRepository.FilterBy(beerQueryParameters).Result;
         }
@@ -85,9 +86,9 @@ namespace BeerOverflow.Services
             }
         }
 
-        private bool AuthorizedUser(User user, Beer beer)
+        private bool AuthorizedUser(User user, BeerResponseDTO beer)
         {
-            if (!user.IsAdmin && beer.CreatedBy != user.Username)
+            if (!user.IsAdmin && beer.CreatedBy.Username != user.Username)
             {
                 return false;
             }

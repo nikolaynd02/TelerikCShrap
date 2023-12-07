@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BeerOverflow.Models
+namespace BeerOverflow.Models.DTOs
 {
     public class BeerDTO
     {

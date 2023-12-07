@@ -46,6 +46,8 @@ namespace BeerOverflow
             //Seeds data to database
             //Check BeerOverflowDbContext class OnModelCreation for database seeding
 
+            //It would be good idea to seed data for ratings
+            //At the moment response for BeerResponseDTO has AvgRating of 0 because there are no ratings in Db
 
             var app = builder.Build();
 

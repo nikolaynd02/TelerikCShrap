@@ -17,6 +17,7 @@ namespace BeerOverflow.Data
         public DbSet<BeerDb> Beers { get; set; }
         public DbSet<StyleDb> Styles { get; set; }
         public DbSet<UserDb> Users { get; set; }
+        public DbSet<RatingDb> Ratings { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder
             .AddInterceptors(new SoftDeleteInterceptor());
@@ -67,6 +68,21 @@ namespace BeerOverflow.Data
             });
             builder.Entity<UserDb>().HasQueryFilter(x => x.IsDeleted == false);
 
+            builder.Entity<RatingDb>(e =>
+            {
+                e.HasKey(r => r.Id);
+
+                e.HasOne(r => r.Beer)
+                .WithMany(b => b.Ratings)
+                .HasForeignKey(r => r.BeerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+                e.HasOne(r => r.User)
+                .WithMany(u => u.Ratings)
+                .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+            });
+            builder.Entity<RatingDb>().HasQueryFilter(x => x.IsDeleted == false);
 
             //Uses Initalizer classes for data seeding
             builder.Entity<StyleDb>().HasData(StyleGenerator.CreteStyles());

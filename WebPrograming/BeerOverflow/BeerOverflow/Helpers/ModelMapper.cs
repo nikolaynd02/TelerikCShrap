@@ -1,4 +1,5 @@
 ﻿using BeerOverflow.Models;
+using BeerOverflow.Models.DTOs;
 using BeerOverflow.Repositories.Contracts;
 
 namespace BeerOverflow.Helpers

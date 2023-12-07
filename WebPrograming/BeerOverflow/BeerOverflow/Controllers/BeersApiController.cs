@@ -1,6 +1,7 @@
 ﻿using BeerOverflow.Exceptions;
 using BeerOverflow.Helpers;
 using BeerOverflow.Models;
+using BeerOverflow.Models.DTOs;
 using BeerOverflow.Services.Contracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
