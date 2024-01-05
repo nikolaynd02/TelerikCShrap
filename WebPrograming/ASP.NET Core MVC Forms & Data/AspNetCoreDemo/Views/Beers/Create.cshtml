@@ -1,0 +1,52 @@
+﻿@using AspNetCoreDemo.Models
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model BeerViewModel
+
+<html>
+<head>
+    <title>BeerOverflow - Beers</title>
+    <link href="~/css/styles.css" rel="stylesheet" />
+</head>
+<body>
+    <header>
+        <div>
+            <h3>
+                <a href="/Home/Index">Home</a>
+                |  <a href="/Home/About">About</a>
+                |  <a href="/Beers/Index">Beers</a>
+                |  <a href="/Beers/Create">Create</a>
+            </h3>
+        </div>
+    </header>
+
+    <div class="row">
+        <div class="col-sm-12 offset-lg-2 col-lg-8 offset-xl-3 col-xl-6">
+            <form asp-action="Create" asp-controller="Beers" method="post">
+                <div class="mb-3">
+                    <label asp-for="@Model.Name" class="form-label">Beer's Name:</label><br />
+                    <input asp-for="@Model.Name" class="form-control" aria-required="true" /><br />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                    <br/>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="@Model.Abv" class="form-label">% ABV</label><br />
+                    <textarea asp-for="@Model.Abv" class="form-control" aria-required="true" rows="5"></textarea><br />
+                    <span asp-validation-for="Abv" class="text-danger"></span>
+                    <br/>
+                </div>                
+                <div class="mb-3">
+                    <label asp-for="@Model.Styles" class="form-label">Style</label><br />
+                    <select asp-items="@Model.Styles" asp-for="StyleId" type="text" class="form-control"></select><br />
+                    <span asp-validation-for="@Model.Styles" class="text-danger"></span><br />
+                </div>
+                <div class="mb-3">
+                    <input class="btn btn-primary" type="submit" value="Add Beer" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+</body>
+</html>
