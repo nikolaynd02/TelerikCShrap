@@ -1,0 +1,30 @@
+﻿@using AspNetCoreDemo.Models
+@model Beer
+
+<html>
+<head>
+    <title>BeerOverflow - Details</title>
+    <link href="~/css/styles.css" rel="stylesheet" />
+</head>
+<body>
+    <header>
+        <div>
+            <h3>
+                <a href="/Home/Index">Home</a>
+                |  <a href="/Home/About">About</a>
+                |  <a href="/Beers/Index">Beers</a>
+            </h3>
+        </div>
+    </header>
+
+    @{
+        int beerId = 1;
+    }
+
+    <h2>@Model.Name</h2>
+
+    <p>% Abv: @Model.Abv</p>
+    <p>Style: @Model.Style.Name</p>
+
+</body>
+</html>
